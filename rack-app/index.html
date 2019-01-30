@@ -7,7 +7,7 @@
   <title>Document</title>
 </head>
 <body>
-  <h1>People</h1>
+  <h1 data-component="people-counter" data-title="People">People</h1>
   <table data-component="people">
     <thead>
       <th>id</th>
@@ -21,6 +21,8 @@
   crossorigin="anonymous"></script>
   <script>
     $(function() {
+      var $EventBus = $({});
+
       var $tag = function(name, val) { return $('<' + name + '>').append(val) };
       var $td = function(val) { return $tag('td', val) };
       var $tr = function(val) { return $tag('tr', val) };
@@ -32,17 +34,29 @@
         ])
       };
 
-      var updatePeopleTable = function(people) {
+      $EventBus.on('update.people.table', function(_, people) {
         var rows = $.map(people, mapPersonAsRow);
 
         $('[data-component="people"] tbody').append(rows);
+      });
+
+      $EventBus.on('update.people.counter', function(_, people) {
+        var total = people.length;
+        var $title = $('[data-component="people-counter"]');
+        var totalText = total ? ' ( ' + total + ' )' : '';
+
+        if (total) $title.text($title.data('title') + totalText);
+      });
+
+      var updatePeopleComponents = function(people) {
+        $EventBus.trigger('update.people', [people]);
       };
 
-      var getPeopleData = function(options) {
+      var getPeopleData = function() {
         return $.get('http://localhost:3009/people')
       };
 
-      getPeopleData().done(updatePeopleTable)
+      getPeopleData().done(updatePeopleComponents)
     });
   </script>
 </body>
