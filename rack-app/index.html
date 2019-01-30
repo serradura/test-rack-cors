@@ -8,13 +8,12 @@
 </head>
 <body>
   <h1>People</h1>
-  <table id="people">
+  <table data-component="people">
     <thead>
       <th>id</th>
       <th>name</th>
     </thead>
-    <tbody>
-    </tbody>
+    <tbody></tbody>
   </table>
   <script
   src="https://code.jquery.com/jquery-3.3.1.min.js"
@@ -22,18 +21,28 @@
   crossorigin="anonymous"></script>
   <script>
     $(function() {
-      var peoplePath = 'http://localhost:3009/people'
+      var $tag = function(name, val) { return $('<' + name + '>').append(val) };
+      var $td = function(val) { return $tag('td', val) };
+      var $tr = function(val) { return $tag('tr', val) };
 
-      $.get(peoplePath).done(function(data) {
-        $.each(data, function(_, person) {
-          $('#people tbody').append([
-            '<tr>',
-              '<td>', person.id ,'</td>',
-              '<td>', person.name ,'</td>',
-            '</tr>'
-          ].join(''))
-        })
-      })
+      var mapPersonAsRow = function(person) {
+        return $tr([
+          $td( person.id ),
+          $td( person.name ),
+        ])
+      };
+
+      var updatePeopleTable = function(people) {
+        var rows = $.map(people, mapPersonAsRow);
+
+        $('[data-component="people"] tbody').append(rows);
+      };
+
+      var getPeopleData = function(options) {
+        return $.get('http://localhost:3009/people')
+      };
+
+      getPeopleData().done(updatePeopleTable)
     });
   </script>
 </body>
