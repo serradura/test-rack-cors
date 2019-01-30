@@ -5,3 +5,9 @@
 #
 #   movies = Movie.create([{ name: 'Star Wars' }, { name: 'Lord of the Rings' }])
 #   Character.create(name: 'Luke', movie: movies.first)
+
+if Rails.env.development?
+  %w[foo bar].each do |name|
+    Person.create!(name: name)
+  end
+end
